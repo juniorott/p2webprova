@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo PPT</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body class="#212121 grey darken-4">
+  <div class="container">
+    <h1 class="center">SOFTWARE DE PEDREIRO APRESENTA:</h1>
+    <h2 class="center">JOKENPO > VERSÃO: JUNIOR FORMIGA</h2>
+    <h2 class="center">PARA JOGAR: Selecione Pedra, Papel ou Tesoura, clique em jogar, E ESQUEÇA TUDO!</h2>
+    <h2 class="rodada center">Rodada: 1</h2>
+    <h2 id="idjogador" class="center"></h2>
+    <div class="row">
+      <div class="col s4">
+        <img id="img" class="responsive-img" src="./imgs/bpedra.png">
+      </div>
+      <div class="col s4">
+        <img id="img" class="responsive-img" src="./imgs/bpapel.png">
+      </div>
+      <div class="col s4">
+        <img id="img" class="responsive-img" src="./imgs/btesoura.png">
+      </div>
+    </div>
+    <div class="row center">
+      <div class="col s4">
+        <button class="button">Pedra</button>
+      </div>
+      <div class="col s4">
+        <button class="button">Papel</button>
+      </div>
+      <div class="col s4">
+        <button class="button">Tesoura</button>
+      </div>
+    </div>
+    <div>
+      <h1 class="center resultado">Resultado:</h1>
+    </div>
+    <div class="center">
+      <h1>Placar:</h1>
+      <h2 class="placar1">Jogador 1: 0</h2>
+      <h2 class="placar2">Jogador 2: 0</h2>
+    </div>
+    <div class="center">
+      <button class="resetar">Reiniciar</button>
+    </div>
+  </div>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="./js/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+  <script>
+    var socket = io();
+    var jogador;
+    var decisao = '';
+    var decisaop1 = '';
+    var decisaop2 = '';
+    socket.on('verificarjogador',(permissao)=>{
+      if (!permissao) {
+        $('.button').addClass('bloqbtn');
+        $('.resetar').addClass('bloqbtn');
+      }
+    });
+    socket.on('user', (player) => {
+      console.log('jogador' + player);
+      jogador = player;
+      $('#idjogador').html('Você é o jogador: ' + jogador);
+    });
+    $('.button').click(function ppt() {
+      decisao = $(this).html();
+      console.log(decisao);
+      $('.button').addClass('bloqbtn');
+      if (jogador == 1) {
+        decisaop1 = decisao;
+        console.log('p1' + decisaop1);
+        socket.emit('decisaop1', decisaop1);
+      } else if (jogador == 2) {
+        decisaop2 = decisao;
+        console.log('p2' + decisaop2);
+        socket.emit('decisaop2', decisaop2);
+      }
+    });
+    socket.on('vencedor', (resultado) => {
+      console.log('resultado' + resultado[0]);
+      if (resultado[0]== 0) {
+        $('.resultado').html('Resultado: Empate');
+      } else {
+        $('.resultado').html('Resultado: Jogador '+resultado[0]);
+      }
+      $('.rodada').html('Rodada: '+resultado[3]);
+      $('.placar1').html('Jogador 1: '+resultado[1]);
+      $('.placar2').html('Jogador 2: '+resultado[2]);
+    });
+    $('.resetar').click(function resetar (){
+      $('.button').removeClass('bloqbtn');
+      $('.resultado').html('Resultado:');
+      var resetar = 1;
+      socket.emit('resetar',resetar);
+    });
+    socket.on('resetado',function resetarf(resetarf){
+      $('.button').removeClass('bloqbtn');
+      $('.resultado').html('Resultado:');
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+#mandar{
+  margin-top: 3rem;
+}
+div{
+  font-family:cursive;
+  color: lightgray;
+  font-weight: 700;
+}
+#img{
+  width: 25em;
+}
+.bloqbtn{
+  pointer-events: none;
+}
